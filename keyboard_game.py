@@ -95,7 +95,7 @@ class player(pygame.sprite.Sprite):
             #将翻转后的图片加入到flipped_run列表中
             self.flipped_run.append(flip_img)
 
-        
+        #跳跃动画
         self.jump_wav = pygame.mixer.Sound('shoot.wav')
         self.jump = [
             pygame.transform.scale(
@@ -105,6 +105,9 @@ class player(pygame.sprite.Sprite):
         ]
         for image in self.jump:
             image.set_colorkey((0,0,0))
+
+        #镜像跳跃动画
+        self.filpped_jump = pygame.transform.flip(self.jump[0],True,False)
 
     #PATR 5 
     #向右行走时的动画循环
@@ -151,17 +154,22 @@ class player(pygame.sprite.Sprite):
             self.rect.x -= self.x_speed
             #PAGE 5
             self.filppedrun_anim()
+            #向右时跳跃
+            if space_flag:
+                    self.y_speed = -20 #the place in y would move up when the space_flag return true
+                    self.jump_wav.play()
+                    self.image = self.filpped_jump
+
         if key[pygame.K_d]:
             self.rect.x += self.x_speed
             #PART 5
             self.run_anim()
+            #向左时跳跃
+            if space_flag:
+                    self.y_speed = -20 #the place in y would move up when the space_flag return true
+                    self.jump_wav.play()
+                    self.image = self.jump[0]
 
-        
-
-        if space_flag:
-            self.y_speed = -20 #the place in y would move up when the space_flag return true
-            self.jump_wav.play()
-            self.image = self.jump[0]
         
         
         #PART 4
