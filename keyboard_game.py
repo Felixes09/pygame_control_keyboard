@@ -5,6 +5,7 @@ screen=pygame.display.set_mode((800,600))
 bg_img = pygame.image.load('background.png').convert()
 bg_img = pygame.transform.scale(bg_img,(800,600))
 
+
 running = True
 
 #设置帧率d
@@ -27,6 +28,7 @@ platform_group = pygame.sprite.Group()
 platform_group.add(platform(topleft=(400,400)))
 platform_group.add(platform(topleft=(250,250)))
 platform_group.add(platform(topleft=(100,150)))
+platform_group.add(platform(topleft=(50,400)))
 
 
 #设置玩家
@@ -44,7 +46,7 @@ class player(pygame.sprite.Sprite):
 
         # PART 2 MOVE THE PLAYER
         self.g = 1
-        self.y_speed = 1
+        self.y_speed = 0
         self.x_speed = 5
 
         #PART 4
@@ -66,6 +68,13 @@ class player(pygame.sprite.Sprite):
         ]
         self.image = self.idle[0]
 
+        #将已有的飘带图片镜像翻转
+        self.flipped_idle = []
+        for image in self.idle:
+            flip_img = pygame.transform.flip(image,True,False)
+            flip_img.set_colorkey((0,0,0))
+            self.flipped_idle.append(flip_img)
+
         #PART 5 ADDED THE APPATENCE OF RUNNING AND BGM WHEN THE PLAYER TACKING ACTION
         self.run = [
             pygame.transform.scale(
@@ -77,8 +86,17 @@ class player(pygame.sprite.Sprite):
         for image in self.run:
             #将图片底色变为透明
             image.set_colorkey((0,0,0))
-        self.jump_wav = pygame.mixer.Sound('shoot.wav')
 
+        #将已有的跑步图片镜像翻转
+        self.flipped_run = []
+        for image in self.run:
+            flip_img = pygame.transform.flip(image,True,False)
+            flip_img.set_colorkey((0,0,0))
+            #将翻转后的图片加入到flipped_run列表中
+            self.flipped_run.append(flip_img)
+
+        
+        self.jump_wav = pygame.mixer.Sound('shoot.wav')
         self.jump = [
             pygame.transform.scale(
                 pygame.image.load(f'player/jump/{0}.png')
@@ -87,6 +105,21 @@ class player(pygame.sprite.Sprite):
         ]
         for image in self.jump:
             image.set_colorkey((0,0,0))
+
+    #PATR 5 
+    #向右行走时的动画循环
+    def run_anim(self):
+            if self.anim_timer >= self.anim_speed:#
+                self.run_frame_index = (self.run_frame_index + 1) % len(self.run) #这个是为了让动画循环播放，%len(self.run)是为了让索引回到0
+                self.anim_timer = 0
+            self.image = self.run[self.run_frame_index]#self.run存放了所有的跑步图片，self.run_frame_index是索引，self.image是当前显示的图片
+
+
+    def filppedrun_anim(self):
+                if self.anim_timer >= self.anim_speed:#
+                    self.run_frame_index = (self.run_frame_index + 1) % len(self.run) #这个是为了让动画循环播放，%len(self.run)是为了让索引回到0
+                    self.anim_timer = 0
+                self.image = self.flipped_run[self.run_frame_index]#self.run存放了所有的跑步图片，self.run_frame_index是索引，self.image是当前显示的图片
             
 
 
@@ -96,6 +129,10 @@ class player(pygame.sprite.Sprite):
         self.y_speed += self.g
         self.rect.bottom += self.y_speed
 
+        '''for platform in platform_group:
+            if self.rect.bottom == platform.rect.top:
+                self.y_speed = -self.y_speed
+                self.rect.bottom = se'''
         #PART4
         self.anim_timer += 1
 
@@ -106,14 +143,14 @@ class player(pygame.sprite.Sprite):
             self.image = self.idle[0]
         if on_ground and space_flag: #returning self.y_speed to -20 when the player was touch with ground and the space_flag return true
             self.y_speed = -20
-        
+
 #键盘控制 the keyboard control of the player
 
         key = pygame.key.get_pressed()
         if key[pygame.K_a]:
             self.rect.x -= self.x_speed
             #PAGE 5
-            self.run_anim()
+            self.filppedrun_anim()
         if key[pygame.K_d]:
             self.rect.x += self.x_speed
             #PART 5
@@ -123,7 +160,6 @@ class player(pygame.sprite.Sprite):
 
         if space_flag:
             self.y_speed = -20 #the place in y would move up when the space_flag return true
-            self.jump_wav.play()
             self.jump_wav.play()
             self.image = self.jump[0]
         
@@ -143,23 +179,22 @@ class player(pygame.sprite.Sprite):
     #cheking for wether the player is on a ground    
     def check_ground(self,platform_group):
 
-        self.rect.y += 3 #strengthing 3 points for checking if the player had touched any platform
-        hit = pygame.sprite.spritecollide(self,platform_group,False)#?
-        self.rect.y -= 3 #shrinking back if the player was touched with any plantform
-        if hit:
-            self.rect.bottom = hit[0].rect.top
-            return True
-        return False
-    
-    #PATR 5 
-    def run_anim(self):
-        if self.anim_timer >= self.anim_speed:
-            self.run_frame_index = (self.run_frame_index + 1) % len(self.run) #这个是为了让动画循环播放，%len(self.run)是为了让索引回到0
-            self.anim_timer = 0
-        self.image = self.run[self.run_frame_index]
+        self.rect.y += 60 #strengthing 3 points for checking if the player had touched any platform
         
+        hit = pygame.sprite.spritecollide(self,platform_group,False)#这返回一个列表，里面是所有和player碰撞的platform
 
-player_group = pygame.sprite.GroupSingle(player(topleft=(100,100)))
+        self.rect.y -= 60 #shrinking back if the player was touched with any plantform
+        if hit:
+            if self.y_speed >= 0: #如果玩家是下落的状态才会触发碰撞检测
+                self.rect.bottom = hit[0].rect.top#将玩家的底部设置为平台的顶部
+                return True
+        else:
+            return False
+
+
+                
+
+player_group = pygame.sprite.GroupSingle(player(topleft=(100,100)))#这个是为了让玩家只能有一个，GroupSingle是一个特殊的组，只能有一个精灵
 
 #PART 6 SHOOTING BULLETS
 class bullet(pygame.sprite.Sprite):
@@ -178,7 +213,7 @@ class bullet(pygame.sprite.Sprite):
 
 
 while running:
-    clock.tick(90)
+    clock.tick(60)
 
 
     space_flag = False
@@ -188,8 +223,9 @@ while running:
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                space_flag = True
-            
+                space_flag = True #转至125行
+
+
 
 
     screen.blit(bg_img,(0,0))
@@ -202,7 +238,7 @@ while running:
     
     #ADDED A FRAME ON PLAYER
     for player in player_group:
-        pygame.draw.rect(screen,  (255, 0, 0), player.rect, width= 3)
+        pygame.draw.rect(screen,  (255, 0, 0), player.rect, width= 1)
 
     pygame.display.flip()
             
