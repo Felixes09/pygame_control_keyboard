@@ -39,7 +39,7 @@ class player(pygame.sprite.Sprite):
         self.image = pygame.Surface((100,100))
 
         #PART 1 BUILDED AND PART 4 CANCELED
-        # self.image.fill("red")
+        #self.image.fill("red")
         self.rect = self.image.get_rect(topleft = topleft)
 
         # PART 2 MOVE THE PLAYER
@@ -75,8 +75,19 @@ class player(pygame.sprite.Sprite):
             for i in range(0, 8)
         ]
         for image in self.run:
+            #将图片底色变为透明
             image.set_colorkey((0,0,0))
         self.jump_wav = pygame.mixer.Sound('shoot.wav')
+
+        self.jump = [
+            pygame.transform.scale(
+                pygame.image.load(f'player/jump/{0}.png')
+                ,(100,100)
+            )
+        ]
+        for image in self.jump:
+            image.set_colorkey((0,0,0))
+            
 
 
 
@@ -92,9 +103,11 @@ class player(pygame.sprite.Sprite):
         on_ground = self.check_ground(platform_group)
         if on_ground:
             self.y_speed = 0
+            self.image = self.idle[0]
         if on_ground and space_flag: #returning self.y_speed to -20 when the player was touch with ground and the space_flag return true
             self.y_speed = -20
         
+#键盘控制 the keyboard control of the player
 
         key = pygame.key.get_pressed()
         if key[pygame.K_a]:
@@ -106,8 +119,14 @@ class player(pygame.sprite.Sprite):
             #PART 5
             self.run_anim()
 
+        
+
         if space_flag:
-            self.y_speed = -20#the place in y would move up when the space_flag return true
+            self.y_speed = -20 #the place in y would move up when the space_flag return true
+            self.jump_wav.play()
+            self.jump_wav.play()
+            self.image = self.jump[0]
+        
         
         #PART 4
         def idel_anim(self):
@@ -117,14 +136,7 @@ class player(pygame.sprite.Sprite):
 
             self.image = self.idle[self.idle_frame_index]
 
-        #PATR 5 
 
-        def run_anim(self):
-            if self.anim_timer >= self.anim_speed:
-                 self.run_frame_index = (self.run_frame_index + 1) % len(self.run)
-                 self.anim_timer = 0
-
-            self.image = self.run[self.run_frame_index]
 
             
 
@@ -142,7 +154,7 @@ class player(pygame.sprite.Sprite):
     #PATR 5 
     def run_anim(self):
         if self.anim_timer >= self.anim_speed:
-            self.run_frame_index = (self.run_frame_index + 1) % len(self.run)
+            self.run_frame_index = (self.run_frame_index + 1) % len(self.run) #这个是为了让动画循环播放，%len(self.run)是为了让索引回到0
             self.anim_timer = 0
         self.image = self.run[self.run_frame_index]
         
@@ -159,12 +171,16 @@ class bullet(pygame.sprite.Sprite):
         self.x_speed  = 4
         super().__init__(*groups)
 
+    
+
 
 
 
 
 while running:
-    clock.tick(60)
+    clock.tick(90)
+
+
     space_flag = False
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
