@@ -186,7 +186,7 @@ class player(pygame.sprite.Sprite):
 
         if key[pygame.K_f]:
             self.jump_wav.play()
-            bullet_group.add(bullet(center=(player_group)))
+            bullet_group.add(bullet(center=self.rect.center))
 
         if not(key[pygame.K_a] or key[pygame.K_d]):
                 if space_flag:
@@ -221,8 +221,12 @@ player_group = pygame.sprite.GroupSingle(player(topleft=(100,100)))#这个是为
 class bullet(pygame.sprite.Sprite):
     def __init__(self, center):
         super().__init__()
-        self.image = pygame.Surface((20, 20))
+        self.image = pygame.Surface((5, 5))
         self.image.fill('red')
+
+        self.rect = self.image.get_rect()
+        self.rect.center = center
+
         #这个是为了让子弹从玩家的中心位置发射
         # 其中player_group.sprite.rect.centerx是玩家的中心位置的x坐标，player_group.sprite.rect.centery是玩家的中心位置的y坐标
         #子弹速度
@@ -232,10 +236,10 @@ class bullet(pygame.sprite.Sprite):
 
 
     def update(self):
-        #self.y_speed += self.g
+        self.y_speed += self.g
         self.rect.x += self.x_speed
-        #self.rect.y += self.y_speed
-        if self.rect.left > 600:
+        self.rect.y += self.y_speed
+        if self.rect.left > 800:
              self.kill()
 
 bullet_group = pygame.sprite.Group()
