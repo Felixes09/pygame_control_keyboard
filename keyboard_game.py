@@ -6,6 +6,7 @@ bg_img = pygame.image.load('background.png').convert()
 bg_img = pygame.transform.scale(bg_img,(800,600))
 
 
+
 running = True
 
 #设置帧率d
@@ -48,6 +49,7 @@ class player(pygame.sprite.Sprite):
         self.g = 1
         self.y_speed = 0
         self.x_speed = 5
+       
 
         #PART 4
         self.run_frame_index = 0
@@ -67,6 +69,7 @@ class player(pygame.sprite.Sprite):
             for i in range(0, 22)
         ]
         self.image = self.idle[0]
+
 
         #将已有的飘带图片镜像翻转
         self.flipped_idle = []
@@ -111,19 +114,33 @@ class player(pygame.sprite.Sprite):
 
     #PATR 5 
     #向右行走时的动画循环
-    def run_anim(self):
-            if self.anim_timer >= self.anim_speed:#
-                self.run_frame_index = (self.run_frame_index + 1) % len(self.run) #这个是为了让动画循环播放，%len(self.run)是为了让索引回到0
-                self.anim_timer = 0
-            self.image = self.run[self.run_frame_index]#self.run存放了所有的跑步图片，self.run_frame_index是索引，self.image是当前显示的图片
 
+    def run_anim(self):
+            if self.anim_timer >= self.anim_speed:
+                #这个是为了让动画循环播放，%len(self.run)是为了让索引回到0
+                self.run_frame_index = (self.run_frame_index + 1) % len(self.run) 
+                self.anim_timer = 0
+                #self.run存放了所有的跑步图片，self.run_frame_index是索引，self.image是当前显示的图片
+            self.image = self.run[self.run_frame_index]
+
+
+    #向左行走时的动画循环
 
     def filppedrun_anim(self):
-                if self.anim_timer >= self.anim_speed:#
-                    self.run_frame_index = (self.run_frame_index + 1) % len(self.run) #这个是为了让动画循环播放，%len(self.run)是为了让索引回到0
+                if self.anim_timer >= self.anim_speed:
+                    #这个是为了让动画循环播放，%len(self.run)是为了让索引回到0
+                    self.run_frame_index = (self.run_frame_index + 1) % len(self.run) 
                     self.anim_timer = 0
-                self.image = self.flipped_run[self.run_frame_index]#self.run存放了所有的跑步图片，self.run_frame_index是索引，self.image是当前显示的图片
-            
+                    #self.run存放了所有的跑步图片，self.run_frame_index是索引，self.image是当前显示的图片
+                self.image = self.flipped_run[self.run_frame_index]
+
+
+    def idel_anim(self):
+        if self.anim_timer>=8:
+            self.frame_index = (self.idle_frame_index + 1)%len(self.idle)
+            self.anim_timer = 0
+
+        self.image = self.idle[self.idle_frame_index]
 
 
 
@@ -132,10 +149,7 @@ class player(pygame.sprite.Sprite):
         self.y_speed += self.g
         self.rect.bottom += self.y_speed
 
-        '''for platform in platform_group:
-            if self.rect.bottom == platform.rect.top:
-                self.y_speed = -self.y_speed
-                self.rect.bottom = se'''
+        
         #PART4
         self.anim_timer += 1
 
@@ -170,17 +184,16 @@ class player(pygame.sprite.Sprite):
                     self.jump_wav.play()
                     self.image = self.jump[0]
 
-        
-        
-        #PART 4
-        def idel_anim(self):
-            if self.anim_timer >= 8:
-                self.frame_index = (self.idle_frame_index + 1) % len(self.idle)
-                self.anim_timer = 0
+        if key[pygame.K_f]:
+            self.jump_wav.play()
+            bullet_group.add(bullet(center=(player_group)))
 
-            self.image = self.idle[self.idle_frame_index]
-
-
+        if not(key[pygame.K_a] or key[pygame.K_d]):
+                if space_flag:
+                     self.y_speed = -20
+                     self.jump_wav.play()
+                     self.image = self.jump[0]
+                self.idel_anim()
 
             
 
@@ -206,23 +219,31 @@ player_group = pygame.sprite.GroupSingle(player(topleft=(100,100)))#这个是为
 
 #PART 6 SHOOTING BULLETS
 class bullet(pygame.sprite.Sprite):
-    def __init__(self, *groups):
+    def __init__(self, center):
         super().__init__()
-        self.image  = pygame.Surface((20,20))
+        self.image = pygame.Surface((20, 20))
         self.image.fill('red')
-        self.rect = self.image.get_rect()
-        self.x_speed  = 4
-        super().__init__(*groups)
+        #这个是为了让子弹从玩家的中心位置发射
+        # 其中player_group.sprite.rect.centerx是玩家的中心位置的x坐标，player_group.sprite.rect.centery是玩家的中心位置的y坐标
+        #子弹速度
+        self.x_speed  = 6
+        self.y_speed = 0
+        self.g = 1
+
+
+    def update(self):
+        #self.y_speed += self.g
+        self.rect.x += self.x_speed
+        #self.rect.y += self.y_speed
+        if self.rect.left > 600:
+             self.kill()
+
+bullet_group = pygame.sprite.Group()
 
     
 
-
-
-
-
 while running:
     clock.tick(60)
-
 
     space_flag = False
     for event in pygame.event.get():
@@ -233,21 +254,24 @@ while running:
             if event.key == pygame.K_SPACE:
                 space_flag = True #转至125行
 
-
-
+        
 
     screen.blit(bg_img,(0,0))
 
-#画入平台
+    #画入平台
     platform_group.draw(screen)
     #画入玩家
     player_group.draw(screen)
     player_group.update(space_flag,platform_group)
+
+    bullet_group.draw(screen)
+    bullet_group.update()
     
     #ADDED A FRAME ON PLAYER
     for player in player_group:
+        #在玩家周围画一个矩形框
         pygame.draw.rect(screen,  (255, 0, 0), player.rect, width= 1)
-
+        
     pygame.display.flip()
             
         
