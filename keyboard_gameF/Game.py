@@ -40,7 +40,7 @@ while running:
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                space_flag = True #转至125行
+                space_flag = True 
 
     screen.blit(bg_img,(0,0))
 
