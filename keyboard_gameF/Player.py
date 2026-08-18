@@ -1,41 +1,12 @@
 import pygame
-
-pygame.init()
-screen=pygame.display.set_mode((800,600))
-bg_img = pygame.image.load('background.png').convert()
-bg_img = pygame.transform.scale(bg_img,(800,600))
+from Bullet import bullet
 
 
 
-running = True
-
-#设置帧率d
-clock = pygame.time.Clock()
-
-#设置平台
-class platform(pygame.sprite.Sprite):
-    def __init__(self, topleft):
-        super().__init__()
-        
-        
-        #这两项是强制的，必须要有
-        self.image = pygame.Surface((200,20))#Surface 要大写，不然fill为白色
-        self.image.fill('white')
-        
-        self.rect = self.image.get_rect(topleft = topleft)#?
-        
-#平台组
-platform_group = pygame.sprite.Group()
-platform_group.add(platform(topleft=(400,400)))
-platform_group.add(platform(topleft=(250,250)))
-platform_group.add(platform(topleft=(100,150)))
-platform_group.add(platform(topleft=(50,400)))
-
-
-#设置玩家
 class player(pygame.sprite.Sprite):
-    def __init__(self, topleft):
+    def __init__(self, topleft,bullet_group):
         super().__init__()
+        self.bullet_group = bullet_group
         #PART 1 the details of the player
         # self.image = pygame.Surface((50,50))
         #PATR 4 CHANGED INTO 100*100
@@ -186,7 +157,7 @@ class player(pygame.sprite.Sprite):
 
         if key[pygame.K_f]:
             self.jump_wav.play()
-            bullet_group.add(bullet(center=self.rect.center))
+            self.bullet_group.add(bullet(center=self.rect.center))
 
         if not(key[pygame.K_a] or key[pygame.K_d]):
                 if space_flag:
@@ -213,72 +184,3 @@ class player(pygame.sprite.Sprite):
                 return True
         else:
             return False
-
-
-                
-
-player_group = pygame.sprite.GroupSingle(player(topleft=(100,100)))#这个是为了让玩家只能有一个，GroupSingle是一个特殊的组，只能有一个精灵
-
-#PART 6 SHOOTING BULLETS
-class bullet(pygame.sprite.Sprite):
-    def __init__(self, center):
-        super().__init__()
-        self.image = pygame.Surface((5, 5))
-        self.image.fill('red')
-
-        self.rect = self.image.get_rect()
-        self.rect.center = center
-
-        #这个是为了让子弹从玩家的中心位置发射
-        # 其中player_group.sprite.rect.centerx是玩家的中心位置的x坐标，player_group.sprite.rect.centery是玩家的中心位置的y坐标
-        #子弹速度
-        self.x_speed  = 50
-        self.y_speed = 0
-        self.g = 1
-
-
-    def update(self):
-        self.y_speed += self.g
-        self.rect.x += self.x_speed
-        self.rect.y += self.y_speed
-        if self.rect.left > 800:
-             self.kill()
-
-bullet_group = pygame.sprite.Group()
-
-    
-
-while running:
-    clock.tick(60)
-
-    space_flag = False
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                space_flag = True #转至125行
-
-        
-
-    screen.blit(bg_img,(0,0))
-
-    #画入平台
-    platform_group.draw(screen)
-    #画入玩家
-    player_group.draw(screen)
-    player_group.update(space_flag,platform_group)
-
-    bullet_group.draw(screen)
-    bullet_group.update()
-    
-    #ADDED A FRAME ON PLAYER
-    for player in player_group:
-        #在玩家周围画一个矩形框
-        pygame.draw.rect(screen,  (255, 0, 0), player.rect, width= 1)
-        
-    pygame.display.flip()
-            
-        
-pygame.quit()
