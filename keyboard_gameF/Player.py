@@ -1,5 +1,8 @@
+import os
 import pygame
 from Bullet import bullet
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 
@@ -144,26 +147,34 @@ class player(pygame.sprite.Sprite):
                     self.y_speed = -20 #the place in y would move up when the space_flag return true
                     self.jump_wav.play()
                     self.image = self.filpped_jump
+            if key[pygame.K_f]:
+                self.jump_wav.play()
+                self.bullet_group.add(bullet(center=self.rect.center,x_speed=-10 - self.x_speed))
+
 
         if key[pygame.K_d]:
             self.rect.x += self.x_speed
-            #PART 5
+            #PART 
             self.run_anim()
             #向左时跳跃
             if space_flag:
                     self.y_speed = -20 #the place in y would move up when the space_flag return true
                     self.jump_wav.play()
                     self.image = self.jump[0]
-
-        if key[pygame.K_f]:
-            self.jump_wav.play()
-            self.bullet_group.add(bullet(center=self.rect.center))
+            if key[pygame.K_f]:
+                    self.jump_wav.play()
+                    self.bullet_group.add(bullet(center=self.rect.center,x_speed=10 + self.x_speed))
 
         if not(key[pygame.K_a] or key[pygame.K_d]):
                 if space_flag:
                     self.y_speed = -20
                     self.jump_wav.play()
                     self.image = self.jump[0]
+
+                if key[pygame.K_f]:
+                    self.jump_wav.play()
+                    self.bullet_group.add(bullet(center=self.rect.center,x_speed=10))
+
                     
                 else:
                     self.idel_anim()

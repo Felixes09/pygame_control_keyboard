@@ -2,7 +2,7 @@ import pygame
 
 #PART 6 SHOOTING BULLETS
 class bullet(pygame.sprite.Sprite):
-    def __init__(self, center):
+    def __init__(self, center,x_speed):
         super().__init__()
         self.image = pygame.Surface((5, 5))
         self.image.fill('red')
@@ -13,7 +13,7 @@ class bullet(pygame.sprite.Sprite):
         #这个是为了让子弹从玩家的中心位置发射
         # 其中player_group.sprite.rect.centerx是玩家的中心位置的x坐标，player_group.sprite.rect.centery是玩家的中心位置的y坐标
         #子弹速度
-        self.x_speed  = 10
+        self.x_speed  = x_speed
         self.y_speed = 0
         self.g = 1
 
