@@ -1,11 +1,17 @@
+import os
 import pygame
 from Platform import platform
 from Player import player
-from Bullet import bullet
+#from Bullet import bullet
+
+#找到Player.py 文件所在的文件夹
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+platform_image_path = os.path.join(BASE_DIR,'background.png')
 
 pygame.init()
 screen=pygame.display.set_mode((800,600))
-bg_img = pygame.image.load('background.png').convert()
+bg_img = pygame.image.load(platform_image_path).convert()
 bg_img = pygame.transform.scale(bg_img,(800,600))
 
 

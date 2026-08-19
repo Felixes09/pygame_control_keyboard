@@ -3,6 +3,7 @@ import pygame
 from Bullet import bullet
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+shoot_wav_path = os.path.join(BASE_DIR,'shoot.wav')
 
 
 
@@ -73,7 +74,7 @@ class player(pygame.sprite.Sprite):
             self.flipped_run.append(flip_img)
 
         #跳跃动画
-        self.jump_wav = pygame.mixer.Sound('shoot.wav')
+        self.jump_wav = pygame.mixer.Sound(shoot_wav_path)
         self.jump = [
             pygame.transform.scale(
                 pygame.image.load(f'player/jump/{0}.png')
