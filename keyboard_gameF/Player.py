@@ -36,13 +36,24 @@ class player(pygame.sprite.Sprite):
         # self.anim_speed = 8
 
         #PART 4 LOADING THE PICTURES FOR THE PLAYER
-        self.idle = [
+
+        self.idle = []
+        for i in range(22):
+            image = pygame.image.load(
+                  os.path.join(BASE_DIR,'player','idle',f'{i:02d}.png')
+            )
+
+            image = pygame.transform.scale(image,(100,100))
+
+            self.idle.append(image)
+            
+        '''self.idle = [
             pygame.transform.scale(
                 pygame.image.load(f'player/idle/{i:02d}.png'),
                 (100, 100)
             )
             for i in range(0, 22)
-        ]
+        ]'''
         self.image = self.idle[0]
 
 
@@ -54,13 +65,22 @@ class player(pygame.sprite.Sprite):
             self.flipped_idle.append(flip_img)
 
         #PART 5 ADDED THE APPATENCE OF RUNNING AND BGM WHEN THE PLAYER TACKING ACTION
-        self.run = [
+
+        self.run=[]
+        for i in range(8):
+             image = pygame.image.load(
+                  os.path.join(BASE_DIR,'player','run',f'{i}.png')
+             )
+             image = pygame.transform.scale(image,(100,100))
+             self.run.append(image)
+
+        '''self.run = [
             pygame.transform.scale(
                 pygame.image.load(f'player/run/{i}.png'),
                 (100, 100)
             )
             for i in range(0, 8)
-        ]
+        ]'''
         for image in self.run:
             #将图片底色变为透明
             image.set_colorkey((0,0,0))
@@ -75,12 +95,21 @@ class player(pygame.sprite.Sprite):
 
         #跳跃动画
         self.jump_wav = pygame.mixer.Sound(shoot_wav_path)
-        self.jump = [
+
+        self.jump = []
+        for i in range(1):
+             image = pygame.image.load(
+                  os.path.join(BASE_DIR,'player','jump',f'{i}.png')
+             )
+             image = pygame.transform.scale(image,(100,100))
+             self.jump.append(image)
+
+        '''self.jump = [
             pygame.transform.scale(
                 pygame.image.load(f'player/jump/{0}.png')
                 ,(100,100)
             )
-        ]
+        ]'''
         for image in self.jump:
             image.set_colorkey((0,0,0))
 
