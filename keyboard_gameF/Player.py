@@ -173,7 +173,7 @@ class player(pygame.sprite.Sprite):
     #cheking for wether the player is on a ground    
     def check_ground(self,platform_group):
 
-        self.rect.y += 60 #strengthing 3 points for checking if the player had touched any platform
+        self.rect.y += 60 #将player上面与platform的碰撞检测点向下移动60个点，若下移动的点太少会产生吸附问题
         
         hit = pygame.sprite.spritecollide(self,platform_group,False)#这返回一个列表，里面是所有和player碰撞的platform
 
