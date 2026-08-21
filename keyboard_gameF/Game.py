@@ -2,6 +2,7 @@ import os
 import pygame
 from Platform import platform
 from Player import player
+from Enemy import Enemy
 #from Bullet import bullet
 
 #找到Player.py 文件所在的文件夹
@@ -23,7 +24,7 @@ clock = pygame.time.Clock()
 
 #平台组
 platform_group = pygame.sprite.Group()
-platform_group.add(platform(topleft=(400,400)))
+platform_group.add(platform(topleft=(400,400),plat_length=400))
 platform_group.add(platform(topleft=(250,250)))
 platform_group.add(platform(topleft=(100,150)))
 platform_group.add(platform(topleft=(50,400)))
@@ -31,10 +32,20 @@ platform_group.add(platform(topleft=(50,400)))
 #子弹组
 bullet_group = pygame.sprite.Group()
 
-#创建玩家组，其中bulet_group是为了在该玩家组Player.py 中的 player里面传入子弹组
+#检测子弹与敌人的碰撞
+'''def check_bullet_enemy_collision():
+    pygame.sprite.groupcollide(
+        bullet_group,
+        enemy_group,
+        True,
+        True
+    )'''
+
+#创建玩家组，并创建一个玩家player,其中bulet_group是为了在该玩家组Player.py 中的 player里面传入子弹组
 player_group = pygame.sprite.GroupSingle(player((100,100),bullet_group))#这个是为了让玩家只能有一个，GroupSingle是一个特殊的组，只能有一个精灵
 
-
+#创建敌人组，并创建一个enemy
+enemy_group = pygame.sprite.GroupSingle(Enemy((400,300),bullet_group,x_speed=6,y_speed = 0))
 
 while running:
     clock.tick(60)
@@ -58,6 +69,15 @@ while running:
 
     bullet_group.draw(screen)
     bullet_group.update()
+
+    #画入敌人
+    enemy_group.draw(screen)
+    enemy_group.update()
+
+    #在主循环中调动子弹与敌人碰撞函数
+    #check_bullet_enemy_collision()
+    for enemy in enemy_group:
+        enemy.check_attack_bullet(bullet_group)
     
     #ADDED A FRAME ON PLAYER
     for player in player_group:

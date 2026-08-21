@@ -18,6 +18,7 @@ class player(pygame.sprite.Sprite):
 
         #PART 1 BUILDED AND PART 4 CANCELED
         #self.image.fill("red")
+        self.init_pos = topleft
         self.rect = self.image.get_rect(topleft = topleft)
 
         # PART 2 MOVE THE PLAYER
@@ -164,6 +165,9 @@ class player(pygame.sprite.Sprite):
             self.image = self.idle[0]
         if on_ground and space_flag: #returning self.y_speed to -20 when the player was touch with ground and the space_flag return true
             self.y_speed = -20
+        #玩家掉出屏幕后回到初始位置
+        if self.rect.bottom > 600:
+            self.rect.topleft = self.init_pos
 
 #键盘控制 the keyboard control of the player
 

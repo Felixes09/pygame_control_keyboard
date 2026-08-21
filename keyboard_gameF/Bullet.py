@@ -1,11 +1,19 @@
 import pygame
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+bullet_image_path = os.path.join(BASE_DIR,'bullet.png')
 
 #PART 6 SHOOTING BULLETS
 class bullet(pygame.sprite.Sprite):
     def __init__(self, center,x_speed):
         super().__init__()
-        self.image = pygame.Surface((5, 5))
-        self.image.fill('red')
+
+        self.image = pygame.image.load(bullet_image_path)
+        self.image = pygame.transform.scale(self.image,(15,15))
+
+        '''self.image = pygame.Surface((5, 5))
+        self.image.fill('red')'''
 
         self.rect = self.image.get_rect()
         self.rect.center = center
