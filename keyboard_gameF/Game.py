@@ -8,12 +8,27 @@ from Enemy import Enemy
 #找到Player.py 文件所在的文件夹
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-platform_image_path = os.path.join(BASE_DIR,'background.png')
+#platform_image_path = os.path.join(BASE_DIR,'background.png')
 
 pygame.init()
-screen=pygame.display.set_mode((800,600))
-bg_img = pygame.image.load(platform_image_path).convert()
-bg_img = pygame.transform.scale(bg_img,(800,600))
+screen = pygame.display.set_mode((800, 600))
+
+background_images = [
+    pygame.image.load(os.path.join(BASE_DIR,'backgrounds','sky.png')).convert_alpha(),
+    pygame.image.load(os.path.join(BASE_DIR,'backgrounds','mountain.png')).convert_alpha(),
+    pygame.image.load(os.path.join(BASE_DIR,'backgrounds','mountains.png')).convert_alpha(),
+    pygame.image.load(os.path.join(BASE_DIR,'backgrounds','forest.png')).convert_alpha(),
+    pygame.image.load(os.path.join(BASE_DIR,'backgrounds','trees.png')).convert_alpha(),
+]
+
+background_images = [
+    pygame.transform.scale(image,(800,600))
+    for image in background_images
+
+]
+ 
+#bg_img = pygame.image.load(platform_image_path).convert()
+#bg_img = pygame.transform.scale(bg_img,(800,600))
 
 
 
@@ -45,7 +60,7 @@ bullet_group = pygame.sprite.Group()
 player_group = pygame.sprite.GroupSingle(player((100,100),bullet_group))#这个是为了让玩家只能有一个，GroupSingle是一个特殊的组，只能有一个精灵
 
 #创建敌人组，并创建一个enemy
-enemy_group = pygame.sprite.GroupSingle(Enemy((400,300),bullet_group,x_speed=6,y_speed = 0))
+enemy_group = pygame.sprite.GroupSingle(Enemy((400,300),bullet_group,x_speed=2,y_speed = 0))
 
 while running:
     clock.tick(60)
@@ -59,7 +74,8 @@ while running:
             if event.key == pygame.K_SPACE:
                 space_flag = True 
 
-    screen.blit(bg_img,(0,0))
+    for image in background_images:
+        screen.blit(image,(0,0))
 
     #画入平台
     platform_group.draw(screen)

@@ -32,9 +32,6 @@ class player(pygame.sprite.Sprite):
         self.idle_frame_index = 0
         self.anim_timer = 0
         self.anim_speed = 8
-        # self.frame_index = 0
-        # self.anim_timer = 0
-        # self.anim_speed = 8
 
         #PART 4 LOADING THE PICTURES FOR THE PLAYER
 
